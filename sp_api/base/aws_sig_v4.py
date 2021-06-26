@@ -25,9 +25,9 @@ class AWSSigV4(AuthBase):
         self.service = service
         self.aws_access_key_id = kwargs.get('aws_access_key_id')
         self.aws_secret_access_key = kwargs.get('aws_secret_access_key')
-        self.aws_session_token = kwargs.get('aws_session_token')
-        if self.aws_access_key_id is None or self.aws_secret_access_key is None:
-            raise KeyError("AWS Access Key ID and Secret Access Key are required")
+        # self.aws_session_token = kwargs.get('aws_session_token')
+        # if self.aws_access_key_id is None or self.aws_secret_access_key is None:
+        #     raise KeyError("AWS Access Key ID and Secret Access Key are required")
         self.region = kwargs.get('region')
 
     def __call__(self, r):
@@ -50,8 +50,8 @@ class AWSSigV4(AuthBase):
         canonical_querystring = "&".join(map(lambda param: "=".join(param), ordered_query_parameters))
 
         headers_to_sign = {'host': host, 'x-amz-date': self.amzdate}
-        if self.aws_session_token is not None:
-            headers_to_sign['x-amz-security-token'] = self.aws_session_token
+        # if self.aws_session_token is not None:
+        #     headers_to_sign['x-amz-security-token'] = self.aws_session_token
 
         ordered_headers = OrderedDict(sorted(headers_to_sign.items(), key=lambda t: t[0]))
         canonical_headers = ''.join(map(lambda h: ":".join(h) + '\n', ordered_headers.items()))
@@ -84,7 +84,7 @@ class AWSSigV4(AuthBase):
         r.headers.update({
             'host': host,
             'x-amz-date': self.amzdate,
-            'Authorization': authorization_header,
-            'x-amz-security-token': self.aws_session_token
+            'Authorization': authorization_header
+            # 'x-amz-security-token': self.aws_session_token
         })
         return r
